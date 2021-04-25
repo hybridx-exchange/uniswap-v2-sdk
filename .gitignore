@@ -1,2 +1,8 @@
 dist
 node_modules
+/.idea/$PRODUCT_WORKSPACE_FILE$
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/uniswap-v2-sdk.iml
+/.idea/vcs.xml

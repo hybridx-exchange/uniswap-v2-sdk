@@ -1,7 +1,7 @@
 import invariant from 'tiny-invariant'
 import JSBI from 'jsbi'
 import { getNetwork } from '@ethersproject/networks'
-import { getDefaultProvider } from '@ethersproject/providers'
+import { BaseProvider, getDefaultProvider } from '@ethersproject/providers'
 import { Contract } from '@ethersproject/contracts'
 import { pack, keccak256 } from '@ethersproject/solidity'
 import { getCreate2Address } from '@ethersproject/address'
@@ -33,6 +33,18 @@ export class Pair {
   public readonly liquidityToken: Token
   private readonly tokenAmounts: [TokenAmount, TokenAmount]
 
+  public static getProvider(_chainId: ChainId) : BaseProvider {
+      let provider
+      if (_chainId === ChainId.OETH) {
+          provider = getDefaultProvider("https://rpc.oasiseth.org:8545")
+      } else {
+          let network = getNetwork(_chainId);
+          provider = getDefaultProvider(network)
+      }
+
+      return provider
+  }
+
   public static computePairAddress = ({
                           factoryAddress,
                           tokenA,
@@ -51,14 +63,7 @@ export class Pair {
   }
 
   public static async fetchAllPairAddress(_chainId: ChainId){
-    let provider
-    if (_chainId === ChainId.OETH) {
-      provider = getDefaultProvider("https://rpc.oasiseth.org:8545")
-    } else {
-      let network = getNetwork(_chainId);
-      provider = getDefaultProvider(network)
-    }
-
+    let provider = this.getProvider(_chainId)
     let factoryContract = new Contract(FACTORY_ADDRESS, FactoryABI, provider)
     let allPairsLengh = await factoryContract.allPairsLength()
 
@@ -90,14 +95,7 @@ export class Pair {
     invariant(tokenA.chainId === tokenB.chainId, 'CHAIN_ID')
     const tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
     if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
-      let provider
-      if (tokenA.chainId === 69) {
-        provider = getDefaultProvider("https://rpc.oasiseth.org:8545")
-      } else {
-        let network = getNetwork(tokenA.chainId);
-        provider = getDefaultProvider(network)
-      }
-
+      let provider = this.getProvider(tokenA.chainId)
       new Contract(FACTORY_ADDRESS, FactoryABI, provider).getPair(tokens[0].address, tokens[1].address).then((pairAddress: string) => {
         let pairToken = new Token(
             tokens[0].chainId,
