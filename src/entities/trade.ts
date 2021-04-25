@@ -12,7 +12,7 @@ import {
   TokenAmount,
   TradeType,
   WETH9
-} from '@uniswap/sdk-core'
+} from 'oasis-uniswap-sdk-core'
 import { ONE, ZERO } from '../constants'
 import invariant from 'tiny-invariant'
 

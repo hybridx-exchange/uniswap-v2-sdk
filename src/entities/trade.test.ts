@@ -2,7 +2,7 @@ import { Pair } from './pair'
 import { Route } from './route'
 import { Trade } from './trade'
 import JSBI from 'jsbi'
-import { ChainId, ETHER, CurrencyAmount, Percent, Token, TokenAmount, TradeType, WETH9 } from '@uniswap/sdk-core'
+import { ChainId, ETHER, CurrencyAmount, Percent, Token, TokenAmount, TradeType, WETH9 } from 'oasis-uniswap-sdk-core'
 
 describe('Trade', () => {
   const token0 = new Token(ChainId.MAINNET, '0x0000000000000000000000000000000000000001', 18, 't0')

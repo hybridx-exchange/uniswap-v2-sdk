@@ -1,4 +1,4 @@
-import { Token, WETH9, ChainId, TokenAmount, ETHER } from '@uniswap/sdk-core'
+import { Token, WETH9, ChainId, TokenAmount, ETHER } from 'oasis-uniswap-sdk-core'
 import { Pair, Route } from './index'
 
 describe('Route', () => {

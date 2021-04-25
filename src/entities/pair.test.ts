@@ -1,4 +1,4 @@
-import { ChainId, Token, TokenAmount, WETH9, Price } from '@uniswap/sdk-core'
+import { ChainId, Token, TokenAmount, WETH9, Price } from 'oasis-uniswap-sdk-core'
 import { InsufficientInputAmountError } from '../errors'
 import { computePairAddress, Pair } from './pair'
 

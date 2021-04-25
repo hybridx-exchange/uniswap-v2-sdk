@@ -1,34 +1,143 @@
-import { BigintIsh, ChainId, Price, sqrt, Token, TokenAmount } from '@uniswap/sdk-core'
+import { BigintIsh, ChainId, Price, sqrt, Token, TokenAmount } from 'oasis-uniswap-sdk-core'
 import invariant from 'tiny-invariant'
 import JSBI from 'jsbi'
 import { pack, keccak256 } from '@ethersproject/solidity'
 import { getCreate2Address } from '@ethersproject/address'
+import { getNetwork } from "@ethersproject/networks"
+import { getDefaultProvider } from "@ethersproject/providers"
+import { Contract } from "@ethersproject/contracts"
 
-import { FACTORY_ADDRESS, INIT_CODE_HASH, MINIMUM_LIQUIDITY, FIVE, _997, _1000, ONE, ZERO } from '../constants'
+
+import FactoryABI from '../abis/Factory.json'
+import PairABI from '../abis/Pair.json'
+import {
+  FACTORY_ADDRESS,
+  MINIMUM_LIQUIDITY,
+  FIVE,
+  _997,
+  _1000,
+  ONE,
+  ZERO,
+  ZERO_ADDRESS,
+  INIT_CODE_HASH
+} from '../constants'
 import { InsufficientReservesError, InsufficientInputAmountError } from '../errors'
 
-export const computePairAddress = ({
-  factoryAddress,
-  tokenA,
-  tokenB
-}: {
-  factoryAddress: string
-  tokenA: Token
-  tokenB: Token
-}): string => {
-  const [token0, token1] = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA] // does safety checks
-  return getCreate2Address(
-    factoryAddress,
-    keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]),
-    INIT_CODE_HASH
-  )
-}
+let PAIR_ADDRESS_CACHE: { [token0Address: string]: { [token1Address: string]: string } } = {}
+
 export class Pair {
   public readonly liquidityToken: Token
   private readonly tokenAmounts: [TokenAmount, TokenAmount]
 
+  public static computePairAddress = ({
+                          factoryAddress,
+                          tokenA,
+                          tokenB
+                        }: {
+    factoryAddress: string
+    tokenA: Token
+    tokenB: Token
+  }): string => {
+    const [token0, token1] = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA] // does safety checks
+    return getCreate2Address(
+        factoryAddress,
+        keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]),
+        INIT_CODE_HASH
+    )
+  }
+
+  public static async fetchAllPairAddress(_chainId: ChainId){
+    let provider
+    if (_chainId === ChainId.OETH) {
+      provider = getDefaultProvider("https://rpc.oasiseth.org:8545")
+    } else {
+      let network = getNetwork(_chainId);
+      provider = getDefaultProvider(network)
+    }
+
+    let factoryContract = new Contract(FACTORY_ADDRESS, FactoryABI, provider)
+    let allPairsLengh = await factoryContract.allPairsLength()
+
+    for (let i = 0; i < allPairsLengh; i++){
+      let pairAddress = await factoryContract.allPairs(i)
+      let pairContract = new Contract(pairAddress, PairABI, provider)
+      let token0 = await pairContract.token0()
+      let token1 = await pairContract.token1()
+      PAIR_ADDRESS_CACHE = {
+        ...PAIR_ADDRESS_CACHE,
+        [token0]: {
+          ...PAIR_ADDRESS_CACHE?.[token0],
+          [token1]: pairAddress
+        }
+      }
+      PAIR_ADDRESS_CACHE = {
+        ...PAIR_ADDRESS_CACHE,
+        [token1]: {
+          ...PAIR_ADDRESS_CACHE?.[token1],
+          [token0]: pairAddress
+        }
+      }
+    }
+  }
+
+  public static fetchPairAddress(
+      tokenA: Token, tokenB: Token
+  ) {
+    invariant(tokenA.chainId === tokenB.chainId, 'CHAIN_ID')
+    const tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
+    if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
+      let provider
+      if (tokenA.chainId === 69) {
+        provider = getDefaultProvider("https://rpc.oasiseth.org:8545")
+      } else {
+        let network = getNetwork(tokenA.chainId);
+        provider = getDefaultProvider(network)
+      }
+
+      new Contract(FACTORY_ADDRESS, FactoryABI, provider).getPair(tokens[0].address, tokens[1].address).then((pairAddress: string) => {
+        let pairToken = new Token(
+            tokens[0].chainId,
+            pairAddress,
+            18,
+            'UNI-V2',
+            'Uniswap V2'
+        )
+
+        if (pairToken) {
+          PAIR_ADDRESS_CACHE = {
+            ...PAIR_ADDRESS_CACHE,
+            [tokens[0].address]: {
+              ...PAIR_ADDRESS_CACHE?.[tokens[0].address],
+              [tokens[1].address]: pairAddress
+            }
+          }
+
+          PAIR_ADDRESS_CACHE = {
+            ...PAIR_ADDRESS_CACHE,
+            [tokens[1].address]: {
+              ...PAIR_ADDRESS_CACHE?.[tokens[1].address],
+              [tokens[0].address]: pairAddress
+            }
+          }
+        }
+      })
+    }
+  }
+
   public static getAddress(tokenA: Token, tokenB: Token): string {
-    return computePairAddress({ factoryAddress: FACTORY_ADDRESS, tokenA, tokenB })
+    invariant(tokenA.chainId === tokenB.chainId, 'CHAIN_ID')
+    if (ChainId.OETH == tokenA.chainId){
+      const tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
+      if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
+        Pair.fetchPairAddress(tokenA, tokenB)
+        return ZERO_ADDRESS
+      }
+
+      return PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address]
+    }
+    else{
+      return this.computePairAddress({factoryAddress: FACTORY_ADDRESS, tokenA, tokenB})
+    }
   }
 
   public constructor(tokenAmountA: TokenAmount, tokenAmountB: TokenAmount) {
@@ -210,3 +319,7 @@ export class Pair {
     )
   }
 }
+
+Pair.fetchAllPairAddress(ChainId.OETH).then(()=>{
+    console.log("fetch all pair done")
+})

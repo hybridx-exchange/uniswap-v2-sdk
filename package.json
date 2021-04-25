@@ -1,5 +1,5 @@
 {
-  "name": "@uniswap/v2-sdk",
+  "name": "oasis-uniswap-v2-sdk",
   "license": "MIT",
   "version": "1.0.7",
   "description": "🛠 An SDK for building applications on top of Uniswap V2",
@@ -8,7 +8,7 @@
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/Uniswap/uniswap-v2-sdk.git",
+  "repository": "https://github.com/dltswap/uniswap-v2-sdk.git",
   "keywords": [
     "uniswap",
     "ethereum"
@@ -24,11 +24,16 @@
   "dependencies": {
     "@ethersproject/address": "^5.0.0",
     "@ethersproject/solidity": "^5.0.0",
-    "@uniswap/sdk-core": "^1.0.9",
+    "oasis-uniswap-sdk-core": "^0.0.1",
     "tiny-invariant": "^1.1.0",
     "tiny-warning": "^1.0.3"
   },
   "devDependencies": {
+    "@ethersproject/address": "^5.0.2",
+    "@ethersproject/contracts": "^5.0.2",
+    "@ethersproject/networks": "^5.0.2",
+    "@ethersproject/providers": "^5.0.5",
+    "@ethersproject/solidity": "^5.0.2",
     "@types/big.js": "^4.0.5",
     "@types/jest": "^24.0.25",
     "@uniswap/v2-core": "^1.0.1",
