@@ -1,14 +1,14 @@
 {
-  "name": "@uniswap/sdk",
+  "name": "oasis-uniswap-v2-sdk",
   "license": "GPL-3.0-or-later",
-  "version": "2.0.3",
+  "version": "0.0.3",
   "description": "🛠 An SDK for building applications on top of Uniswap.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/Uniswap/uniswap-sdk.git",
+  "repository": "https://github.com/dltswap/uniswap-v2-sdk.git",
   "keywords": [
     "uniswap",
     "ethereum"
