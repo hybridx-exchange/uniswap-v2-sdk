@@ -27,10 +27,12 @@ import { Token } from './token'
 import { Price } from './fractions/price'
 import { TokenAmount } from './fractions/tokenAmount'
 
-let PAIR_ADDRESS_CACHE: { [token0Address: string]: { [token1Address: string]: string } } = {}
+let PAIR_ADDRESS_CACHE: { [token0Address: string]: { [token1Address: string]: string } } =
+    localStorage.getItem('PAIR_ADDRESS_CACHE') ? JSON.parse(<string>localStorage.getItem('PAIR_ADDRESS_CACHE')) : {}
+let PAIR_OBJ_CACHE: { [pairKey: string]: Pair } = {}
 
 export class Pair {
-  public readonly liquidityToken: Token
+  public liquidityToken: Token
   private readonly tokenAmounts: [TokenAmount, TokenAmount]
 
   public static getProvider(_chainId: ChainId) : BaseProvider {
@@ -87,6 +89,7 @@ export class Pair {
         }
       }
     }
+    localStorage.setItem('PAIR_ADDRESS_CACHE', JSON.stringify(PAIR_ADDRESS_CACHE))
   }
 
   public static fetchPairAddress(
@@ -121,6 +124,11 @@ export class Pair {
               [tokens[0].address]: pairAddress
             }
           }
+          localStorage.setItem('PAIR_ADDRESS_CACHE', JSON.stringify(PAIR_ADDRESS_CACHE))
+          let pairKey1 = tokens[0].address.concat(tokens[1].address)
+          let pairKey2 = tokens[1].address.concat(tokens[0].address)
+          if (PAIR_OBJ_CACHE[pairKey1]) PAIR_OBJ_CACHE[pairKey1].liquidityToken = pairToken
+          if (PAIR_OBJ_CACHE[pairKey2]) PAIR_OBJ_CACHE[pairKey2].liquidityToken = pairToken
         }
       })
     }
@@ -154,6 +162,8 @@ export class Pair {
       'Uniswap V2'
     )
     this.tokenAmounts = tokenAmounts as [TokenAmount, TokenAmount]
+    PAIR_OBJ_CACHE[tokenAmounts[0].token.address.concat(tokenAmounts[1].token.address)] = this
+    PAIR_OBJ_CACHE[tokenAmounts[1].token.address.concat(tokenAmounts[0].token.address)] = this
   }
 
     /**
