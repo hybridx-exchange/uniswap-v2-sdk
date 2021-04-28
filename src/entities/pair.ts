@@ -1,170 +1,175 @@
 import invariant from 'tiny-invariant'
 import JSBI from 'jsbi'
-import { getNetwork } from '@ethersproject/networks'
-import { BaseProvider, getDefaultProvider } from '@ethersproject/providers'
-import { Contract } from '@ethersproject/contracts'
-import { pack, keccak256 } from '@ethersproject/solidity'
-import { getCreate2Address } from '@ethersproject/address'
+import {getNetwork} from '@ethersproject/networks'
+import {BaseProvider, getDefaultProvider} from '@ethersproject/providers'
+import {Contract} from '@ethersproject/contracts'
+import {pack, keccak256} from '@ethersproject/solidity'
+import {getCreate2Address} from '@ethersproject/address'
 
 import FactoryABI from '../abis/Factory.json'
 import PairABI from '../abis/Pair.json'
 import {
-  BigintIsh,
-  ChainId,
-  FACTORY_ADDRESS,
-  ZERO_ADDRESS,
-  INIT_CODE_HASH,
-  MINIMUM_LIQUIDITY,
-  ZERO,
-  ONE,
-  FIVE,
-  _997,
-  _1000
+    BigintIsh,
+    ChainId,
+    FACTORY_ADDRESS,
+    ZERO_ADDRESS,
+    INIT_CODE_HASH,
+    MINIMUM_LIQUIDITY,
+    ZERO,
+    ONE,
+    FIVE,
+    _997,
+    _1000
 } from '../constants'
-import { sqrt, parseBigintIsh } from '../utils'
-import { InsufficientReservesError, InsufficientInputAmountError } from '../errors'
-import { Token } from './token'
-import { Price } from './fractions/price'
-import { TokenAmount } from './fractions/tokenAmount'
+import {sqrt, parseBigintIsh} from '../utils'
+import {InsufficientReservesError, InsufficientInputAmountError} from '../errors'
+import {Token} from './token'
+import {Price} from './fractions/price'
+import {TokenAmount} from './fractions/tokenAmount'
 
 let PAIR_ADDRESS_CACHE: { [token0Address: string]: { [token1Address: string]: string } } =
     localStorage.getItem('PAIR_ADDRESS_CACHE') ? JSON.parse(<string>localStorage.getItem('PAIR_ADDRESS_CACHE')) : {}
 let PAIR_OBJ_CACHE: { [pairKey: string]: Pair } = {}
 
 export class Pair {
-  public liquidityToken: Token
-  private readonly tokenAmounts: [TokenAmount, TokenAmount]
+    public liquidityToken: Token
+    private readonly tokenAmounts: [TokenAmount, TokenAmount]
 
-  public static getProvider(_chainId: ChainId) : BaseProvider {
-      let provider
-      if (_chainId === ChainId.OETH) {
-          provider = getDefaultProvider("https://rpc.oasiseth.org:8545")
-      } else {
-          let network = getNetwork(_chainId);
-          provider = getDefaultProvider(network)
-      }
-
-      return provider
-  }
-
-  public static computePairAddress = ({
-                          factoryAddress,
-                          tokenA,
-                          tokenB
-                        }: {
-    factoryAddress: string
-    tokenA: Token
-    tokenB: Token
-  }): string => {
-    const [token0, token1] = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA] // does safety checks
-    return getCreate2Address(
-        factoryAddress,
-        keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]),
-        INIT_CODE_HASH
-    )
-  }
-
-  public static async fetchAllPairAddress(_chainId: ChainId){
-    let provider = this.getProvider(_chainId)
-    let factoryContract = new Contract(FACTORY_ADDRESS, FactoryABI, provider)
-    let allPairsLengh = await factoryContract.allPairsLength()
-
-    for (let i = 0; i < allPairsLengh; i++){
-      let pairAddress = await factoryContract.allPairs(i)
-      let pairContract = new Contract(pairAddress, PairABI, provider)
-      let token0 = await pairContract.token0()
-      let token1 = await pairContract.token1()
-      PAIR_ADDRESS_CACHE = {
-        ...PAIR_ADDRESS_CACHE,
-        [token0]: {
-          ...PAIR_ADDRESS_CACHE?.[token0],
-          [token1]: pairAddress
+    public static getProvider(_chainId: ChainId): BaseProvider {
+        let provider
+        if (_chainId === ChainId.OETH) {
+            provider = getDefaultProvider("https://rpc.oasiseth.org:8545")
+        } else {
+            let network = getNetwork(_chainId);
+            provider = getDefaultProvider(network)
         }
-      }
-      PAIR_ADDRESS_CACHE = {
-        ...PAIR_ADDRESS_CACHE,
-        [token1]: {
-          ...PAIR_ADDRESS_CACHE?.[token1],
-          [token0]: pairAddress
-        }
-      }
+
+        return provider
     }
-    localStorage.setItem('PAIR_ADDRESS_CACHE', JSON.stringify(PAIR_ADDRESS_CACHE))
-  }
 
-  public static fetchPairAddress(
-      tokenA: Token, tokenB: Token
-  ) {
-    invariant(tokenA.chainId === tokenB.chainId, 'CHAIN_ID')
-    const tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
-    if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
-      let provider = this.getProvider(tokenA.chainId)
-      new Contract(FACTORY_ADDRESS, FactoryABI, provider).getPair(tokens[0].address, tokens[1].address).then((pairAddress: string) => {
-        let pairToken = new Token(
-            tokens[0].chainId,
-            pairAddress,
+    public static computePairAddress = ({
+                                            factoryAddress,
+                                            tokenA,
+                                            tokenB
+                                        }: {
+        factoryAddress: string
+        tokenA: Token
+        tokenB: Token
+    }): string => {
+        const [token0, token1] = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA] // does safety checks
+        return getCreate2Address(
+            factoryAddress,
+            keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]),
+            INIT_CODE_HASH
+        )
+    }
+
+    public static async fetchAllPairAddress(_chainId: ChainId) {
+        let provider = this.getProvider(_chainId)
+        let factoryContract = new Contract(FACTORY_ADDRESS, FactoryABI, provider)
+        let allPairsLengh = await factoryContract.allPairsLength()
+
+        for (let i = 0; i < allPairsLengh; i++) {
+            let pairAddress = await factoryContract.allPairs(i)
+            if (PAIR_ADDRESS_CACHE?.[pairAddress] === undefined) {
+                let pairContract = new Contract(pairAddress, PairABI, provider)
+                let token0 = await pairContract.token0()
+                let token1 = await pairContract.token1()
+                PAIR_ADDRESS_CACHE = {
+                    ...PAIR_ADDRESS_CACHE,
+                    [token0]: {
+                        ...PAIR_ADDRESS_CACHE?.[token0],
+                        [token1]: pairAddress
+                    }
+                }
+                PAIR_ADDRESS_CACHE = {
+                    ...PAIR_ADDRESS_CACHE,
+                    [token1]: {
+                        ...PAIR_ADDRESS_CACHE?.[token1],
+                        [token0]: pairAddress
+                    }
+                }
+                PAIR_ADDRESS_CACHE = {
+                    ...PAIR_ADDRESS_CACHE,
+                    [pairAddress]: token0.concat("-").concat(token1)
+                }
+            }
+        }
+        localStorage.setItem('PAIR_ADDRESS_CACHE', JSON.stringify(PAIR_ADDRESS_CACHE))
+    }
+
+    public static fetchPairAddress(
+        tokenA: Token, tokenB: Token
+    ) {
+        invariant(tokenA.chainId === tokenB.chainId, 'CHAIN_ID')
+        const tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
+        if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
+            let provider = this.getProvider(tokenA.chainId)
+            new Contract(FACTORY_ADDRESS, FactoryABI, provider).getPair(tokens[0].address, tokens[1].address).then((pairAddress: string) => {
+                let pairToken = new Token(
+                    tokens[0].chainId,
+                    pairAddress,
+                    18,
+                    'UNI-V2',
+                    'Uniswap V2'
+                )
+
+                if (pairToken) {
+                    PAIR_ADDRESS_CACHE = {
+                        ...PAIR_ADDRESS_CACHE,
+                        [tokens[0].address]: {
+                            ...PAIR_ADDRESS_CACHE?.[tokens[0].address],
+                            [tokens[1].address]: pairAddress
+                        }
+                    }
+
+                    PAIR_ADDRESS_CACHE = {
+                        ...PAIR_ADDRESS_CACHE,
+                        [tokens[1].address]: {
+                            ...PAIR_ADDRESS_CACHE?.[tokens[1].address],
+                            [tokens[0].address]: pairAddress
+                        }
+                    }
+                    localStorage.setItem('PAIR_ADDRESS_CACHE', JSON.stringify(PAIR_ADDRESS_CACHE))
+                    let pairKey1 = tokens[0].address.concat(tokens[1].address)
+                    let pairKey2 = tokens[1].address.concat(tokens[0].address)
+                    if (PAIR_OBJ_CACHE[pairKey1]) PAIR_OBJ_CACHE[pairKey1].liquidityToken = pairToken
+                    if (PAIR_OBJ_CACHE[pairKey2]) PAIR_OBJ_CACHE[pairKey2].liquidityToken = pairToken
+                }
+            })
+        }
+    }
+
+    public static getAddress(tokenA: Token, tokenB: Token): string {
+        invariant(tokenA.chainId === tokenB.chainId, 'CHAIN_ID')
+        if (ChainId.OETH == tokenA.chainId) {
+            const tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
+            if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
+                Pair.fetchPairAddress(tokenA, tokenB)
+                return ZERO_ADDRESS
+            }
+
+            return PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address]
+        } else {
+            return this.computePairAddress({factoryAddress: FACTORY_ADDRESS, tokenA, tokenB})
+        }
+    }
+
+    constructor(tokenAmountA: TokenAmount, tokenAmountB: TokenAmount) {
+        const tokenAmounts = tokenAmountA.token.sortsBefore(tokenAmountB.token) // does safety checks
+            ? [tokenAmountA, tokenAmountB]
+            : [tokenAmountB, tokenAmountA]
+        this.liquidityToken = new Token(
+            tokenAmounts[0].token.chainId,
+            Pair.getAddress(tokenAmounts[0].token, tokenAmounts[1].token),
             18,
             'UNI-V2',
             'Uniswap V2'
         )
-
-        if (pairToken) {
-          PAIR_ADDRESS_CACHE = {
-            ...PAIR_ADDRESS_CACHE,
-            [tokens[0].address]: {
-              ...PAIR_ADDRESS_CACHE?.[tokens[0].address],
-              [tokens[1].address]: pairAddress
-            }
-          }
-
-          PAIR_ADDRESS_CACHE = {
-            ...PAIR_ADDRESS_CACHE,
-            [tokens[1].address]: {
-              ...PAIR_ADDRESS_CACHE?.[tokens[1].address],
-              [tokens[0].address]: pairAddress
-            }
-          }
-          localStorage.setItem('PAIR_ADDRESS_CACHE', JSON.stringify(PAIR_ADDRESS_CACHE))
-          let pairKey1 = tokens[0].address.concat(tokens[1].address)
-          let pairKey2 = tokens[1].address.concat(tokens[0].address)
-          if (PAIR_OBJ_CACHE[pairKey1]) PAIR_OBJ_CACHE[pairKey1].liquidityToken = pairToken
-          if (PAIR_OBJ_CACHE[pairKey2]) PAIR_OBJ_CACHE[pairKey2].liquidityToken = pairToken
-        }
-      })
+        this.tokenAmounts = tokenAmounts as [TokenAmount, TokenAmount]
+        PAIR_OBJ_CACHE[tokenAmounts[0].token.address.concat(tokenAmounts[1].token.address)] = this
+        PAIR_OBJ_CACHE[tokenAmounts[1].token.address.concat(tokenAmounts[0].token.address)] = this
     }
-  }
-
-  public static getAddress(tokenA: Token, tokenB: Token): string {
-    invariant(tokenA.chainId === tokenB.chainId, 'CHAIN_ID')
-    if (ChainId.OETH == tokenA.chainId){
-      const tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
-      if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
-        Pair.fetchPairAddress(tokenA, tokenB)
-        return ZERO_ADDRESS
-      }
-
-      return PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address]
-    }
-    else{
-      return this.computePairAddress({factoryAddress: FACTORY_ADDRESS, tokenA, tokenB})
-    }
-  }
-
-  constructor(tokenAmountA: TokenAmount, tokenAmountB: TokenAmount) {
-    const tokenAmounts = tokenAmountA.token.sortsBefore(tokenAmountB.token) // does safety checks
-      ? [tokenAmountA, tokenAmountB]
-      : [tokenAmountB, tokenAmountA]
-    this.liquidityToken = new Token(
-      tokenAmounts[0].token.chainId,
-      Pair.getAddress(tokenAmounts[0].token, tokenAmounts[1].token),
-      18,
-      'UNI-V2',
-      'Uniswap V2'
-    )
-    this.tokenAmounts = tokenAmounts as [TokenAmount, TokenAmount]
-    PAIR_OBJ_CACHE[tokenAmounts[0].token.address.concat(tokenAmounts[1].token.address)] = this
-    PAIR_OBJ_CACHE[tokenAmounts[1].token.address.concat(tokenAmounts[0].token.address)] = this
-  }
 
     /**
      * Returns true if the token is either token0 or token1
@@ -332,6 +337,6 @@ export class Pair {
     }
 }
 
-Pair.fetchAllPairAddress(ChainId.OETH).then(()=>{
+Pair.fetchAllPairAddress(ChainId.OETH).then(() => {
     console.log("fetch all pair done")
 })
