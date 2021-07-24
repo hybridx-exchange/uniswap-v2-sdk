@@ -106,6 +106,11 @@ export class Pair {
         if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
             let provider = this.getProvider(tokenA.chainId)
             new Contract(FACTORY_ADDRESS, FactoryABI, provider).getPair(tokens[0].address, tokens[1].address).then((pairAddress: string) => {
+                console.log("Pair(%s-%s) address:%s", tokens[0].address, tokens[1].address, pairAddress)
+                if (pairAddress === ZERO_ADDRESS){
+                    return
+                }
+
                 let pairToken = new Token(
                     tokens[0].chainId,
                     pairAddress,
@@ -142,7 +147,7 @@ export class Pair {
 
     public static getAddress(tokenA: Token, tokenB: Token): string {
         invariant(tokenA.chainId === tokenB.chainId, 'CHAIN_ID')
-        if (ChainId.OETH == tokenA.chainId) {
+        if (ChainId.OETH === tokenA.chainId) {
             const tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
             if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
                 Pair.fetchPairAddress(tokenA, tokenB)
