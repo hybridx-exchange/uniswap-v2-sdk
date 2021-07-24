@@ -93,6 +93,17 @@ export class Pair {
                     ...PAIR_ADDRESS_CACHE,
                     [pairAddress]: token0.concat("-").concat(token1)
                 }
+                let pairKey1 = token0.concat(token1)
+                let pairKey2 = token1.concat(token0)
+                let pairToken = new Token(
+                    _chainId,
+                    pairAddress,
+                    18,
+                    'UNI-V2',
+                    'Uniswap V2'
+                )
+                if (PAIR_OBJ_CACHE[pairKey1]) PAIR_OBJ_CACHE[pairKey1].liquidityToken = pairToken
+                if (PAIR_OBJ_CACHE[pairKey2]) PAIR_OBJ_CACHE[pairKey2].liquidityToken = pairToken
             }
         }
         localStorage.setItem('PAIR_ADDRESS_CACHE', JSON.stringify(PAIR_ADDRESS_CACHE))
@@ -151,7 +162,7 @@ export class Pair {
             const tokens = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA]
             if (PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address] === undefined) {
                 Pair.fetchPairAddress(tokenA, tokenB)
-                return ZERO_ADDRESS
+                return this.computePairAddress({factoryAddress: FACTORY_ADDRESS, tokenA, tokenB})
             }
 
             return PAIR_ADDRESS_CACHE?.[tokens[0].address]?.[tokens[1].address]
