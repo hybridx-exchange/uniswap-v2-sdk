@@ -2,7 +2,7 @@ import JSBI from 'jsbi'
 import { Pair, Route, Trade } from './entities'
 import { Router } from './router'
 import invariant from 'tiny-invariant'
-import { ChainId, CurrencyAmount, ETHER, Percent, Token, TokenAmount, WETH9 } from '@uniswap/sdk-core'
+import { ChainId, CurrencyAmount, ETHER, Percent, Token, TokenAmount, WETH9 } from 'emerald-uniswap-sdk-core'
 
 function checkDeadline(deadline: string[] | string): void {
   expect(typeof deadline).toBe('string')

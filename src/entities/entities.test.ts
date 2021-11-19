@@ -1,6 +1,6 @@
 import JSBI from 'jsbi'
 import invariant from 'tiny-invariant'
-import { ChainId, WETH9 as _WETH9, TradeType, Rounding, Token, TokenAmount } from '@uniswap/sdk-core'
+import { ChainId, WETH9 as _WETH9, TradeType, Rounding, Token, TokenAmount } from 'emerald-uniswap-sdk-core'
 import { Pair, Route, Trade } from '../index'
 
 const ADDRESSES = [

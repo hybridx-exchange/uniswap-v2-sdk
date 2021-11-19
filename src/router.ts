@@ -1,4 +1,4 @@
-import { CurrencyAmount, ETHER, Percent, TradeType, validateAndParseAddress } from '@uniswap/sdk-core'
+import { CurrencyAmount, ETHER, Percent, TradeType, validateAndParseAddress } from 'emerald-uniswap-sdk-core'
 import { Trade } from 'entities'
 import invariant from 'tiny-invariant'
 

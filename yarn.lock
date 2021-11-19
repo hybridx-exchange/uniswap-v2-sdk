@@ -1706,19 +1706,6 @@
     semver "^7.3.2"
     tsutils "^3.17.1"
 
-"@uniswap/sdk-core@^1.0.9":
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@uniswap/sdk-core/-/sdk-core-1.0.9.tgz#67e8d506e2c563f5183245ae9c32c54ac083479b"
-  integrity sha512-CWvDhN7mU+v786HEqAcyDhRMlLt9r6/Etgcduc36PlmmWk1Bb2XyK/UGMu/MD8cB9NlJ0h17WLx/X+CFg93ivg==
-  dependencies:
-    "@ethersproject/address" "^5.0.2"
-    big.js "^5.2.2"
-    decimal.js-light "^2.5.0"
-    jsbi "^3.1.4"
-    tiny-invariant "^1.1.0"
-    tiny-warning "^1.0.3"
-    toformat "^2.0.0"
-
 "@uniswap/v2-core@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@uniswap/v2-core/-/v2-core-1.0.1.tgz#af8f508bf183204779938969e2e54043e147d425"
@@ -2685,6 +2672,19 @@ electron-to-chromium@^1.3.649:
   version "1.3.681"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.681.tgz#facd915ae46a020e8be566a2ecdc0b9444439be9"
   integrity sha512-W6uYvSUTHuyX2DZklIESAqx57jfmGjUkd7Z3RWqLdj9Mmt39ylhBuvFXlskQnvBHj0MYXIeQI+mjiwVddZLSvA==
+
+emerald-uniswap-sdk-core@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/emerald-uniswap-sdk-core/-/emerald-uniswap-sdk-core-1.0.9.tgz#addc7176efb6635510f69fa312cfde9a7930bc88"
+  integrity sha512-2jef56YZfLb7/Hw7G71burEii5hM9er3GFiOSRsoe6WzXabmg/ate0MrmPcP69XPkSDg6CmCIXTOWsi+l8yosQ==
+  dependencies:
+    "@ethersproject/address" "^5.0.2"
+    big.js "^5.2.2"
+    decimal.js-light "^2.5.0"
+    jsbi "^3.1.4"
+    tiny-invariant "^1.1.0"
+    tiny-warning "^1.0.3"
+    toformat "^2.0.0"
 
 emoji-regex@^7.0.1:
   version "7.0.3"
