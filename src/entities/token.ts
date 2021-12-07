@@ -59,14 +59,14 @@ export function currencyEquals(currencyA: Currency, currencyB: Currency): boolea
 export const WETH = {
   [42262]: new Token(
       42262,
-    '0x0006D7a9bA2F626Fd78643A73aDf597ad4423AD8',
+    '0xb9ab821f7323dB4357Bf71eA66670C01761c3d73',
     18,
     'WROSE',
     'Wrapped ROSE'
   ),
   [42261]: new Token(
       42261,
-    '0x0006D7a9bA2F626Fd78643A73aDf597ad4423AD8',
+    '0xb9ab821f7323dB4357Bf71eA66670C01761c3d73',
     18,
     'WROSE',
     'Wrapped ROSE'

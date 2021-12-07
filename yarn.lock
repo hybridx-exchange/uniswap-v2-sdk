@@ -1034,6 +1034,11 @@
     "@ethersproject/properties" ">=5.0.0-beta.131"
     "@ethersproject/strings" ">=5.0.0-beta.130"
 
+"@hybridx-exchange/v2-core@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@hybridx-exchange/v2-core/-/v2-core-0.1.0.tgz#83534c7e59a3d942a30c202a47580ab7a9061ded"
+  integrity sha512-xGjrWYAnKEXbXChY5iVjO3Jqg40tAQ2ZDtNQhHBUkDmz30PiZLZaFQVUmzlmOpwtpoipmSw+H18t0Pl3aCcIlQ==
+
 "@jest/console@^24.7.1", "@jest/console@^24.9.0":
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/@jest/console/-/console-24.9.0.tgz#79b1bc06fb74a8cfb01cbdedf945584b1b9707f0"
@@ -1431,11 +1436,6 @@
     lodash "^4.17.15"
     semver "^6.3.0"
     tsutils "^3.17.1"
-
-"@uniswap/v2-core@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@uniswap/v2-core/-/v2-core-1.0.0.tgz#e0fab91a7d53e8cafb5326ae4ca18351116b0844"
-  integrity sha512-BJiXrBGnN8mti7saW49MXwxDBRFiWemGetE58q8zgfnPPzQKq55ADltEILqOt6VFZ22kVeVKbF8gVd8aY3l7pA==
 
 abab@^2.0.0:
   version "2.0.3"
