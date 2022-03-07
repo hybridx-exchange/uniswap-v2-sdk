@@ -194,7 +194,7 @@ export class Trade {
       this.inputAmount.raw,
       this.outputAmount.raw
     )
-    this.nextMidPrice = Price.fromRoute(new Route(nextPairs, route.input))
+    this.nextMidPrice = Price.fromRoute(new Route(nextPairs, [], route.input))
     this.priceImpact = computePriceImpact(route.midPrice, this.inputAmount, this.outputAmount)
   }
 
@@ -291,7 +291,7 @@ export class Trade {
         sortedInsert(
           bestTrades,
           new Trade(
-            new Route([...currentPairs, pair], originalAmountIn.currency, currencyOut),
+            new Route([...currentPairs, pair], [], originalAmountIn.currency, currencyOut),
             originalAmountIn,
             TradeType.EXACT_INPUT
           ),
@@ -379,7 +379,7 @@ export class Trade {
         sortedInsert(
           bestTrades,
           new Trade(
-            new Route([pair, ...currentPairs], currencyIn, originalAmountOut.currency),
+            new Route([pair, ...currentPairs], [], currencyIn, originalAmountOut.currency),
             originalAmountOut,
             TradeType.EXACT_OUTPUT
           ),
