@@ -1,6 +1,6 @@
 import invariant from 'tiny-invariant'
 
-import { ChainId, ONE, TradeType, ZERO } from '../constants'
+import {BigintIsh, ChainId, ONE, TradeType, ZERO} from '../constants'
 import { sortedInsert } from '../utils'
 import { Currency, ETHER } from './currency'
 import { CurrencyAmount } from './fractions/currencyAmount'
@@ -99,6 +99,10 @@ function wrappedCurrency(currency: Currency, chainId: ChainId): Token {
   invariant(false, 'CURRENCY')
 }
 
+function replaceTokenAmount(tokenAmount: TokenAmount, amount: BigintIsh) : TokenAmount {
+  return new TokenAmount(tokenAmount.token, amount)
+}
+
 /**
  * Represents a trade executed against a list of pairs.
  * Does not account for slippage, i.e. trades that front run this trade and move the price.
@@ -159,7 +163,9 @@ export class Trade {
       amounts[0] = wrappedAmount(amount, route.chainId)
       for (let i = 0; i < route.path.length - 1; i++) {
         const pair = route.pairs[i]
-        const [outputAmount, nextPair] = pair.getOutputAmount(amounts[i])
+        let [outputAmount, nextPair] = pair.getOutputAmount(amounts[i])
+        outputAmount = route.amounts.length == route.path.length ?
+            replaceTokenAmount(outputAmount, route.amounts[i + 1]) : outputAmount
         amounts[i + 1] = outputAmount
         nextPairs[i] = nextPair
       }
@@ -168,7 +174,9 @@ export class Trade {
       amounts[amounts.length - 1] = wrappedAmount(amount, route.chainId)
       for (let i = route.path.length - 1; i > 0; i--) {
         const pair = route.pairs[i - 1]
-        const [inputAmount, nextPair] = pair.getInputAmount(amounts[i])
+        let [inputAmount, nextPair] = pair.getInputAmount(amounts[i])
+        inputAmount = route.amounts.length == route.path.length ?
+            replaceTokenAmount(inputAmount, route.amounts[i - 1]) : inputAmount
         amounts[i - 1] = inputAmount
         nextPairs[i - 1] = nextPair
       }
