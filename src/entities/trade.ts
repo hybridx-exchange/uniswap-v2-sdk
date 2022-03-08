@@ -164,8 +164,10 @@ export class Trade {
       for (let i = 0; i < route.path.length - 1; i++) {
         const pair = route.pairs[i]
         let [outputAmount, nextPair] = pair.getOutputAmount(amounts[i])
-        outputAmount = route.amounts.length == route.path.length ?
-            replaceTokenAmount(outputAmount, route.amounts[i + 1]) : outputAmount
+        if (route.amounts.length == route.path.length) {
+          outputAmount = replaceTokenAmount(outputAmount, route.amounts[i + 1])
+          nextPair = new Pair(replaceTokenAmount(amounts[i], route.nextReserves[2 * i]), replaceTokenAmount(outputAmount, route.nextReserves[2 * i + 1]))
+        }
         amounts[i + 1] = outputAmount
         nextPairs[i] = nextPair
       }
@@ -175,8 +177,10 @@ export class Trade {
       for (let i = route.path.length - 1; i > 0; i--) {
         const pair = route.pairs[i - 1]
         let [inputAmount, nextPair] = pair.getInputAmount(amounts[i])
-        inputAmount = route.amounts.length == route.path.length ?
-            replaceTokenAmount(inputAmount, route.amounts[i - 1]) : inputAmount
+        if (route.amounts.length == route.path.length) {
+          inputAmount = replaceTokenAmount(inputAmount, route.amounts[i - 1])
+          nextPair = new Pair(replaceTokenAmount(inputAmount, route.nextReserves[2 * (i - 1)]), replaceTokenAmount(amounts[i], route.nextReserves[2 * (i - 1) + 1]))
+        }
         amounts[i - 1] = inputAmount
         nextPairs[i - 1] = nextPair
       }
@@ -202,7 +206,7 @@ export class Trade {
       this.inputAmount.raw,
       this.outputAmount.raw
     )
-    this.nextMidPrice = Price.fromRoute(new Route(nextPairs, [], route.input))
+    this.nextMidPrice = Price.fromRoute(new Route(nextPairs, [], [], route.input))
     this.priceImpact = computePriceImpact(route.midPrice, this.inputAmount, this.outputAmount)
   }
 
@@ -299,7 +303,7 @@ export class Trade {
         sortedInsert(
           bestTrades,
           new Trade(
-            new Route([...currentPairs, pair], [], originalAmountIn.currency, currencyOut),
+            new Route([...currentPairs, pair], [], [], originalAmountIn.currency, currencyOut),
             originalAmountIn,
             TradeType.EXACT_INPUT
           ),
@@ -387,7 +391,7 @@ export class Trade {
         sortedInsert(
           bestTrades,
           new Trade(
-            new Route([pair, ...currentPairs], [], currencyIn, originalAmountOut.currency),
+            new Route([pair, ...currentPairs], [], [], currencyIn, originalAmountOut.currency),
             originalAmountOut,
             TradeType.EXACT_OUTPUT
           ),
