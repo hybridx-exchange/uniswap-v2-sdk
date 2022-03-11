@@ -2,24 +2,31 @@ import { TokenAmount } from './fractions/tokenAmount'
 import { Token } from './token'
 import { pack, keccak256 } from '@ethersproject/solidity'
 import { getCreate2Address } from '@ethersproject/address'
-import {BigintIsh, ORDER_BOOK_FACTORY_ADDRESS, ORDER_BOOK_INIT_CODE_HASH} from '../constants'
-import {Order} from "entities/fractions/order";
+import { BigintIsh, ORDER_BOOK_FACTORY_ADDRESS, ORDER_BOOK_INIT_CODE_HASH } from '../constants'
+import { Order } from './fractions/order';
 
 let ORDERBOOK_ADDRESS_CACHE: { [token0Address: string]: { [token1Address: string]: string } } = {}
 
 export class OrderBook {
+  public readonly baseToken: TokenAmount
+  public readonly quoteToken: TokenAmount
   public readonly orderBookAddress: String
   public readonly protocolFeeRate: BigintIsh
   public readonly subsidyFeeRate: BigintIsh
+  public readonly curPrice: TokenAmount
   public readonly buyOrders: Order[]
   public readonly sellOrders: Order[]
 
-  public constructor(tokenAmountA: TokenAmount, tokenAmountB: TokenAmount,
+  public constructor(baseToken: TokenAmount, quoteToken: TokenAmount,
                      protocolFeeRate: BigintIsh, subsidyFeeRate: BigintIsh,
+                     curPrice: TokenAmount,
                      buyOrders: Order[], sellOrders: Order[]) {
-    this.orderBookAddress = OrderBook.getAddress(tokenAmountA.token, tokenAmountB.token)
+    this.orderBookAddress = OrderBook.getAddress(baseToken.token, quoteToken.token)
+    this.baseToken = baseToken
+    this.quoteToken = quoteToken
     this.protocolFeeRate = protocolFeeRate
     this.subsidyFeeRate = subsidyFeeRate
+    this.curPrice = curPrice
     this.buyOrders = buyOrders
     this.sellOrders = sellOrders
   }

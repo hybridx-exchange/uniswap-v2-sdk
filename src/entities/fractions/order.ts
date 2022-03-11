@@ -1,11 +1,10 @@
 import { TokenAmount } from './tokenAmount'
-import { Price } from './price'
 
 export class Order {
-    public readonly price: Price
+    public readonly price: TokenAmount
     public readonly amount: TokenAmount
 
-    public constructor(price: Price, amount: TokenAmount){
+    public constructor(price: TokenAmount, amount: TokenAmount){
         this.price = price
         this.amount = amount
     }
