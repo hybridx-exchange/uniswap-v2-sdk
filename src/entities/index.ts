@@ -4,5 +4,5 @@ export * from './orderBook'
 export * from './route'
 export * from './trade'
 export * from './currency'
-
+export * from './tradeRet'
 export * from './fractions'
