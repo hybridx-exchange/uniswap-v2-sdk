@@ -1,5 +1,5 @@
 import invariant from 'tiny-invariant'
-import { ChainId, WETH as _WETH, TradeType, Rounding, Token, TokenAmount, Pair, Route, Trade } from '../src'
+import { ChainId, WETH as _WETH, SwapType, Rounding, Token, TokenAmount, Pair, Route, Swap } from '../src'
 
 const ADDRESSES = [
   '0x0000000000000000000000000000000000000001',
@@ -111,9 +111,9 @@ describe('entities', () => {
           )
           const inputAmount = new TokenAmount(tokens[1], decimalize(1, tokens[1].decimals))
           const expectedOutputAmount = new TokenAmount(WETH, '1662497915624478906')
-          const trade = new Trade(route, inputAmount, TradeType.EXACT_INPUT)
+          const trade = new Swap(route, inputAmount, SwapType.EXACT_INPUT)
           expect(trade.route).toEqual(route)
-          expect(trade.tradeType).toEqual(TradeType.EXACT_INPUT)
+          expect(trade.swapType).toEqual(SwapType.EXACT_INPUT)
           expect(trade.inputAmount).toEqual(inputAmount)
           expect(trade.outputAmount).toEqual(expectedOutputAmount)
 
@@ -131,9 +131,9 @@ describe('entities', () => {
         it('TradeType.EXACT_OUTPUT', () => {
           const outputAmount = new TokenAmount(WETH, '1662497915624478906')
           const expectedInputAmount = new TokenAmount(tokens[1], decimalize(1, tokens[1].decimals))
-          const trade = new Trade(route, outputAmount, TradeType.EXACT_OUTPUT)
+          const trade = new Swap(route, outputAmount, SwapType.EXACT_OUTPUT)
           expect(trade.route).toEqual(route)
-          expect(trade.tradeType).toEqual(TradeType.EXACT_OUTPUT)
+          expect(trade.swapType).toEqual(SwapType.EXACT_OUTPUT)
           expect(trade.outputAmount).toEqual(outputAmount)
           expect(trade.inputAmount).toEqual(expectedInputAmount)
 
@@ -164,7 +164,7 @@ describe('entities', () => {
               tokens[1]
             )
             const outputAmount = new TokenAmount(tokens[1], '1')
-            const trade = new Trade(route, outputAmount, TradeType.EXACT_INPUT)
+            const trade = new Swap(route, outputAmount, SwapType.EXACT_INPUT)
 
             expect(trade.priceImpact.toSignificant(18)).toEqual(
               tokens[1].decimals === 9 ? '0.300000099400899902' : '0.3000000000000001'

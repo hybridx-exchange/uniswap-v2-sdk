@@ -8,9 +8,14 @@ export enum ChainId {
   TESTNET = 42261
 }
 
-export enum TradeType {
+export enum SwapType {
   EXACT_INPUT,
   EXACT_OUTPUT
+}
+
+export enum TradeType {
+  LIMIT_BUY,
+  LIMIT_SELL
 }
 
 export enum Rounding {

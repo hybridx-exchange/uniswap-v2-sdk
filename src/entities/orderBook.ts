@@ -11,6 +11,8 @@ export class OrderBook {
   public readonly baseToken: TokenAmount
   public readonly quoteToken: TokenAmount
   public readonly orderBookAddress: String
+  public readonly minAmount: BigintIsh
+  public readonly priceStep: BigintIsh
   public readonly protocolFeeRate: BigintIsh
   public readonly subsidyFeeRate: BigintIsh
   public readonly curPrice: TokenAmount
@@ -18,12 +20,15 @@ export class OrderBook {
   public readonly sellOrders: Order[]
 
   public constructor(baseToken: TokenAmount, quoteToken: TokenAmount,
+                     minAmount: BigintIsh, priceStep: BigintIsh,
                      protocolFeeRate: BigintIsh, subsidyFeeRate: BigintIsh,
                      curPrice: TokenAmount,
                      buyOrders: Order[], sellOrders: Order[]) {
     this.orderBookAddress = OrderBook.getAddress(baseToken.token, quoteToken.token)
     this.baseToken = baseToken
     this.quoteToken = quoteToken
+    this.minAmount = minAmount
+    this.priceStep = priceStep
     this.protocolFeeRate = protocolFeeRate
     this.subsidyFeeRate = subsidyFeeRate
     this.curPrice = curPrice

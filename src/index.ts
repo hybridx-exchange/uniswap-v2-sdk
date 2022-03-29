@@ -4,6 +4,7 @@ export { JSBI }
 export {
   BigintIsh,
   ChainId,
+  SwapType,
   TradeType,
   Rounding,
   FACTORY_ADDRESS,

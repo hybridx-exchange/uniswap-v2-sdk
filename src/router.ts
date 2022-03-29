@@ -1,12 +1,12 @@
-import { TradeType } from './constants'
+import { SwapType } from './constants'
 import invariant from 'tiny-invariant'
-import { validateAndParseAddress } from './utils'
-import { CurrencyAmount, ETHER, Percent, Trade } from './entities'
+import { validateAndParseAddress, toHex, ZERO_HEX } from './utils'
+import { ETHER, Percent, Swap } from './entities'
 
 /**
  * Options for producing the arguments to send call to the router.
  */
-export interface TradeOptions {
+export interface SwapOptions {
   /**
    * How much the execution price is allowed to move unfavorably from the trade execution price.
    */
@@ -28,7 +28,7 @@ export interface TradeOptions {
   feeOnTransfer?: boolean
 }
 
-export interface TradeOptionsDeadline extends Omit<TradeOptions, 'ttl'> {
+export interface SwapOptionsDeadline extends Omit<SwapOptions, 'ttl'> {
   /**
    * When the transaction expires.
    * This is an atlernate to specifying the ttl, for when you do not want to use local time.
@@ -54,12 +54,6 @@ export interface SwapParameters {
   value: string
 }
 
-function toHex(currencyAmount: CurrencyAmount) {
-  return `0x${currencyAmount.raw.toString(16)}`
-}
-
-const ZERO_HEX = '0x0'
-
 /**
  * Represents the Uniswap V2 Router, and has static methods for helping execute trades.
  */
@@ -73,7 +67,7 @@ export abstract class Router {
    * @param trade to produce call parameters for
    * @param options options for the call parameters
    */
-  public static swapCallParameters(trade: Trade, options: TradeOptions | TradeOptionsDeadline): SwapParameters {
+  public static swapCallParameters(trade: Swap, options: SwapOptions | SwapOptionsDeadline): SwapParameters {
     const etherIn = trade.inputAmount.currency === ETHER
     const etherOut = trade.outputAmount.currency === ETHER
     // the router does not support both ether in and out
@@ -94,8 +88,8 @@ export abstract class Router {
     let methodName: string
     let args: (string | string[])[]
     let value: string
-    switch (trade.tradeType) {
-      case TradeType.EXACT_INPUT:
+    switch (trade.swapType) {
+      case SwapType.EXACT_INPUT:
         if (etherIn) {
           methodName = useFeeOnTransfer ? 'swapExactETHForTokensSupportingFeeOnTransferTokens' : 'swapExactETHForTokens'
           // (uint amountOutMin, address[] calldata path, address to, uint deadline)
@@ -115,7 +109,7 @@ export abstract class Router {
           value = ZERO_HEX
         }
         break
-      case TradeType.EXACT_OUTPUT:
+      case SwapType.EXACT_OUTPUT:
         invariant(!useFeeOnTransfer, 'EXACT_OUT_FOT')
         if (etherIn) {
           methodName = 'swapETHForExactTokens'

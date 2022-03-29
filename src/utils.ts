@@ -4,6 +4,13 @@ import JSBI from 'jsbi'
 import {getAddress} from '@ethersproject/address'
 
 import {BigintIsh, ZERO, ONE, TWO, THREE, SolidityType, SOLIDITY_TYPE_MAXIMA} from './constants'
+import {CurrencyAmount} from "entities";
+
+export function toHex(currencyAmount: CurrencyAmount) {
+    return `0x${currencyAmount.raw.toString(16)}`
+}
+
+export const ZERO_HEX = '0x0'
 
 export function validateSolidityTypeInstance(value: JSBI, solidityType: SolidityType): void {
     invariant(JSBI.greaterThanOrEqual(value, ZERO), `${value} is not a ${solidityType}.`)
