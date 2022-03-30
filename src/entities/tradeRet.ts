@@ -1,5 +1,5 @@
 import { TokenAmount } from "entities/fractions";
-import {OrderBook} from "entities/orderBook";
+import { OrderBook } from "entities/orderBook";
 
 export class TradeRet {
     public readonly orderBook: OrderBook
