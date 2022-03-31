@@ -11,7 +11,8 @@ export {
   INIT_CODE_HASH,
   ORDER_BOOK_FACTORY_ADDRESS,
   ORDER_BOOK_INIT_CODE_HASH,
-  MINIMUM_LIQUIDITY
+  MINIMUM_LIQUIDITY,
+  ZERO
 } from './constants'
 
 export * from './errors'
