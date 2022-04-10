@@ -9,6 +9,7 @@ export class TradeRet {
     public readonly orderAmountOut: TokenAmount
     public readonly orderFee: TokenAmount
     public readonly amountLeft: TokenAmount
+    public readonly amountExpert: TokenAmount
     public readonly priceTo: TokenAmount
 
     public constructor (orderBook: OrderBook,
@@ -18,6 +19,7 @@ export class TradeRet {
     orderAmountOut: TokenAmount,
     orderFee: TokenAmount,
     amountLeft: TokenAmount,
+    amountExpert: TokenAmount,
     priceTo: TokenAmount) {
         this.orderBook = orderBook
         this.ammAmountIn = ammAmountIn
@@ -26,6 +28,7 @@ export class TradeRet {
         this.orderAmountOut = orderAmountOut
         this.orderFee = orderFee
         this.amountLeft = amountLeft
+        this.amountExpert = amountExpert
         this.priceTo = priceTo
     }
 }
