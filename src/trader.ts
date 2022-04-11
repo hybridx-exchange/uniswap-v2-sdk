@@ -66,6 +66,9 @@ export abstract class Trader {
     // the router does not support both ether in and out
     invariant(!((trade.baseToken === ETHER && baseToken === WETH[baseToken.chainId]) || (trade.baseToken === baseToken)), 'BASE_TOKEN_NOT_MATCH')
     invariant(!((trade.quoteToken === ETHER && quoteToken === WETH[quoteToken.chainId]) || (trade.quoteToken === quoteToken)), 'QUOTE_TOKEN_NOT_MATCH')
+    invariant(((trade.quoteToken === ETHER && trade.baseToken === WETH[quoteToken.chainId]) ||
+        (trade.baseToken === ETHER && trade.quoteToken === WETH[quoteToken.chainId]) ||
+        (trade.quoteToken === trade.baseToken)), 'TOKEN_NOT_MATCH')
     invariant(!('ttl' in options) || options.ttl > 0, 'TTL')
 
     const to: string = validateAndParseAddress(options.recipient)
