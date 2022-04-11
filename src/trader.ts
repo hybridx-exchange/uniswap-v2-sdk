@@ -1,7 +1,8 @@
-import {TradeType} from './constants'
+import {TradeType, ZERO} from './constants'
 import invariant from 'tiny-invariant'
-import {toHex, validateAndParseAddress, ZERO_HEX} from './utils'
+import {parseBigintIsh, toHex, validateAndParseAddress, ZERO_HEX} from './utils'
 import {ETHER, Trade, WETH} from './entities'
+import JSBI from "jsbi";
 
 /**
  * Options for producing the arguments to send call to the router.
@@ -64,11 +65,13 @@ export abstract class Trader {
     const quoteToken = trade.orderBook.quoteToken.token
     const etherIn = (type === TradeType.LIMIT_BUY && trade.quoteToken === ETHER) || (type === TradeType.LIMIT_SELL && trade.baseToken === ETHER)
     // the router does not support both ether in and out
-    invariant(!((trade.baseToken === ETHER && baseToken === WETH[baseToken.chainId]) || (trade.baseToken === baseToken)), 'BASE_TOKEN_NOT_MATCH')
-    invariant(!((trade.quoteToken === ETHER && quoteToken === WETH[quoteToken.chainId]) || (trade.quoteToken === quoteToken)), 'QUOTE_TOKEN_NOT_MATCH')
-    invariant(((trade.quoteToken === ETHER && trade.baseToken === WETH[quoteToken.chainId]) ||
+    invariant(((trade.baseToken === ETHER && baseToken === WETH[baseToken.chainId]) || (trade.baseToken === baseToken)), 'BASE_TOKEN_NOT_MATCH')
+    invariant(((trade.quoteToken === ETHER && quoteToken === WETH[quoteToken.chainId]) || (trade.quoteToken === quoteToken)), 'QUOTE_TOKEN_NOT_MATCH')
+    invariant(!((trade.quoteToken === ETHER && trade.baseToken === WETH[quoteToken.chainId]) ||
         (trade.baseToken === ETHER && trade.quoteToken === WETH[quoteToken.chainId]) ||
         (trade.quoteToken === trade.baseToken)), 'TOKEN_NOT_MATCH')
+    invariant(JSBI.remainder(trade.amount.raw, parseBigintIsh(trade.orderBook.minAmount)) === ZERO, 'AMOUNT_TOO_SMALL')
+    invariant(JSBI.GE(trade.price.raw, parseBigintIsh(trade.orderBook.priceStep)), 'PRICE_MISMATCH_STEP')
     invariant(!('ttl' in options) || options.ttl > 0, 'TTL')
 
     const to: string = validateAndParseAddress(options.recipient)
