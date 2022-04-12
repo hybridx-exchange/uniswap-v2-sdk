@@ -4,6 +4,8 @@ import { pack, keccak256 } from '@ethersproject/solidity'
 import { getCreate2Address } from '@ethersproject/address'
 import { BigintIsh, ORDER_BOOK_FACTORY_ADDRESS, ORDER_BOOK_INIT_CODE_HASH } from '../constants'
 import { Order } from './fractions/order';
+import JSBI from "jsbi";
+import {parseBigintIsh} from "utils";
 
 let ORDERBOOK_ADDRESS_CACHE: { [token0Address: string]: { [token1Address: string]: string } } = {}
 
@@ -54,5 +56,9 @@ export class OrderBook {
     }
 
     return ORDERBOOK_ADDRESS_CACHE[tokens[0].address][tokens[1].address]
+  }
+
+  public getMinBaseAmount(inputPrice: BigintIsh) : BigintIsh {
+    return JSBI.multiply(parseBigintIsh(inputPrice), parseBigintIsh(this.minAmount))
   }
 }
