@@ -1,11 +1,12 @@
-import { TokenAmount } from './fractions/tokenAmount'
-import { Token } from './token'
-import { pack, keccak256 } from '@ethersproject/solidity'
-import { getCreate2Address } from '@ethersproject/address'
-import { BigintIsh, ORDER_BOOK_FACTORY_ADDRESS, ORDER_BOOK_INIT_CODE_HASH } from '../constants'
-import { Order } from './fractions/order';
+import {TokenAmount} from './fractions/tokenAmount'
+import {Token} from './token'
+import {keccak256, pack} from '@ethersproject/solidity'
+import {getCreate2Address} from '@ethersproject/address'
+import {BigintIsh, ORDER_BOOK_FACTORY_ADDRESS, ORDER_BOOK_INIT_CODE_HASH, TradeType} from '../constants'
+import {Order} from './fractions/order';
 import JSBI from "jsbi";
 import {parseBigintIsh} from "../utils";
+import {formatUnits, parseUnits} from "@ethersproject/units";
 
 let ORDERBOOK_ADDRESS_CACHE: { [token0Address: string]: { [token1Address: string]: string } } = {}
 
@@ -58,7 +59,28 @@ export class OrderBook {
     return ORDERBOOK_ADDRESS_CACHE[tokens[0].address][tokens[1].address]
   }
 
-  public getMinBaseAmount(inputPrice: BigintIsh) : BigintIsh {
-    return JSBI.multiply(parseBigintIsh(inputPrice), parseBigintIsh(this.minAmount))
+  public getMinBaseAmount(parsedPrice: BigintIsh) : BigintIsh {
+    return JSBI.divide(JSBI.multiply(parseBigintIsh(parsedPrice), parseBigintIsh(this.minAmount)),
+        parseBigintIsh(parseUnits('1', this.quoteToken.token.decimals).toString()))
+  }
+
+  public getPriceSignificantDigits() : number {
+    const priceStepAmount = formatUnits(this.priceStep.toString(), this.quoteToken.token.decimals)
+    return priceStepAmount.substring(priceStepAmount.indexOf('.')).length
+  }
+
+  public getAmountSignificantDigits(tradeType: TradeType) : number {
+    if (tradeType === TradeType.LIMIT_SELL) {
+      const minAmount = JSBI.divide(JSBI.multiply(parseBigintIsh(this.minAmount), parseBigintIsh(this.priceStep)),
+          parseBigintIsh(parseUnits('1', this.quoteToken.token.decimals).toString()))
+      const minAmountAmount = formatUnits(minAmount.toString(), this.baseToken.token.decimals)
+      return minAmountAmount.substring(minAmountAmount.indexOf('.')).length
+    } else if (tradeType === TradeType.LIMIT_BUY) {
+      const minAmount = this.minAmount
+      const minAmountAmount = formatUnits(minAmount.toString(), this.quoteToken.token.decimals)
+      return minAmountAmount.substring(minAmountAmount.indexOf('.')).length
+    }
+
+    return 18
   }
 }
