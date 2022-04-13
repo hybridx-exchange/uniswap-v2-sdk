@@ -14,8 +14,8 @@ export enum SwapType {
 }
 
 export enum TradeType {
-  LIMIT_BUY,
-  LIMIT_SELL
+  LIMIT_BUY = 1,
+  LIMIT_SELL= 2
 }
 
 export enum Rounding {
