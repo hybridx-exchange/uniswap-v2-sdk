@@ -1,8 +1,7 @@
-import {TradeType, ZERO} from './constants'
+import {TradeType} from './constants'
 import invariant from 'tiny-invariant'
-import {parseBigintIsh, toHex, validateAndParseAddress, ZERO_HEX} from './utils'
+import {toHex, validateAndParseAddress, ZERO_HEX} from './utils'
 import {ETHER, Trade, WETH} from './entities'
-import JSBI from "jsbi";
 
 /**
  * Options for producing the arguments to send call to the router.
