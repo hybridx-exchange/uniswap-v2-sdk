@@ -70,9 +70,11 @@ export abstract class Trader {
     invariant(!((trade.quoteToken === ETHER && trade.baseToken === WETH[quoteToken.chainId]) ||
         (trade.baseToken === ETHER && trade.quoteToken === WETH[quoteToken.chainId]) ||
         (trade.quoteToken === trade.baseToken)), 'TOKEN_NOT_MATCH')
-    invariant(JSBI.equal(JSBI.remainder(trade.price.raw, parseBigintIsh(trade.orderBook.priceStep)), ZERO), 'PRICE_MISMATCH_STEP')
-    invariant((type === TradeType.LIMIT_BUY && JSBI.GE(trade.amount.raw, parseBigintIsh(trade.orderBook.minAmount)) ||
-        (type === TradeType.LIMIT_SELL && JSBI.GE(trade.amount.raw, trade.orderBook.getMinBaseAmount(trade.price.raw)))), 'AMOUNT_TOO_SMALL')
+    //invariant(JSBI.equal(JSBI.remainder(trade.price.raw, parseBigintIsh(trade.orderBook.priceStep)), ZERO),
+      // 'PRICE_MISMATCH_STEP')
+    //invariant((type === TradeType.LIMIT_BUY && JSBI.GE(trade.amount.raw, parseBigintIsh(trade.orderBook.minAmount)) ||
+        //(type === TradeType.LIMIT_SELL && JSBI.GE(trade.amount.raw,
+      // trade.orderBook.getMinBaseAmount(trade.price.raw)))), 'AMOUNT_TOO_SMALL')
     invariant(!('ttl' in options) || options.ttl > 0, 'TTL')
 
     const to: string = validateAndParseAddress(options.recipient)

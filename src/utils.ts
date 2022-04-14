@@ -3,7 +3,7 @@ import warning from 'tiny-warning'
 import JSBI from 'jsbi'
 import {getAddress} from '@ethersproject/address'
 
-import {BigintIsh, ZERO, ONE, TWO, THREE, SolidityType, SOLIDITY_TYPE_MAXIMA} from './constants'
+import {BigintIsh, ChainId, ONE, SOLIDITY_TYPE_MAXIMA, SolidityType, THREE, TWO, ZERO} from './constants'
 import {CurrencyAmount} from "entities";
 
 export function toHex(currencyAmount: CurrencyAmount) {
@@ -86,4 +86,8 @@ export function sortedInsert<T>(items: T[], add: T, maxSize: number, comparator:
         items.splice(lo, 0, add)
         return isFull ? items.pop()! : null
     }
+}
+
+export function validChainId(chainId: number | undefined) : boolean {
+    return chainId === ChainId.MAINNET.valueOf() || chainId === ChainId.TESTNET.valueOf()
 }
