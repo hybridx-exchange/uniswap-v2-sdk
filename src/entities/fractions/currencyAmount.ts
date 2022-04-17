@@ -8,6 +8,7 @@ import toFormat from 'toformat'
 import { BigintIsh, Rounding, TEN, SolidityType } from '../../constants'
 import { parseBigintIsh, validateSolidityTypeInstance } from '../../utils'
 import { Fraction } from './fraction'
+import {parseUnits} from "@ethersproject/units";
 
 const Big = toFormat(_Big)
 
@@ -60,6 +61,16 @@ export class CurrencyAmount extends Fraction {
   ): string {
     invariant(decimalPlaces <= this.currency.decimals, 'DECIMALS')
     return super.toFixed(decimalPlaces, format, rounding)
+  }
+
+  public toFixedWithoutExtraZero(
+      decimalPlaces: number = this.currency.decimals,
+      format?: object,
+      rounding: Rounding = Rounding.ROUND_DOWN
+  ): string {
+    invariant(decimalPlaces <= this.currency.decimals, 'DECIMALS')
+    const fixedString = super.toFixed(decimalPlaces, format, rounding)
+    return new CurrencyAmount(this.currency, parseUnits(fixedString, this.currency.decimals).toString()).toExact(format)
   }
 
   public toExact(format: object = { groupSeparator: '' }): string {

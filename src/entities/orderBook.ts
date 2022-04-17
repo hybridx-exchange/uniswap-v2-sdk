@@ -65,12 +65,12 @@ export class OrderBook {
         parseBigintIsh(parseUnits('1', this.baseToken.token.decimals).toString()))
   }
 
-  public getPriceSignificantDigits() : number {
+  public getPriceStepDecimal() : number {
     const priceStepAmount = formatUnits(this.priceStep.toString(), this.quoteToken.token.decimals)
     return priceStepAmount.substring(priceStepAmount.indexOf('.')).length
   }
 
-  public getAmountSignificantDigits(tradeType: TradeType) : number {
+  public getMinAmountDecimal(tradeType: TradeType) : number {
     if (tradeType === TradeType.LIMIT_BUY) {
       const minAmount = JSBI.divide(JSBI.multiply(parseBigintIsh(this.minAmount), parseBigintIsh(this.priceStep)),
           parseBigintIsh(parseUnits('1', this.baseToken.token.decimals).toString()))
