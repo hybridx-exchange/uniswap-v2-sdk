@@ -33,6 +33,16 @@ export class TradeRet {
     }
 
     public equalTo(other: TradeRet): boolean {
+        if (!this.ammAmountIn &&
+            !this.ammAmountOut &&
+            !this.orderAmountIn &&
+            !this.orderAmountOut &&
+            !this.amountLeft &&
+            !this.amountExpect &&
+            !this.orderFee) {
+            return false
+        }
+
         return this.ammAmountIn.equalTo(other.ammAmountIn) &&
             this.ammAmountOut.equalTo(other.ammAmountOut) &&
             this.orderAmountIn.equalTo(other.orderAmountIn) &&
