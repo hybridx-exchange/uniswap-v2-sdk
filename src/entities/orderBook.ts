@@ -84,4 +84,19 @@ export class OrderBook {
 
     return 18
   }
+
+  public getMinOutputAmountDecimal(tradeType: TradeType) : number {
+    if (tradeType === TradeType.LIMIT_SELL) {
+      const minAmount = JSBI.divide(JSBI.multiply(parseBigintIsh(this.minAmount), parseBigintIsh(this.priceStep)),
+          parseBigintIsh(parseUnits('1', this.baseToken.token.decimals).toString()))
+      const minAmountAmount = formatUnits(minAmount.toString(), this.quoteToken.token.decimals)
+      return minAmountAmount.substring(minAmountAmount.indexOf('.')).length
+    } else if (tradeType === TradeType.LIMIT_BUY) {
+      const minAmount = this.minAmount
+      const minAmountAmount = formatUnits(minAmount.toString(), this.baseToken.token.decimals)
+      return minAmountAmount.substring(minAmountAmount.indexOf('.')).length
+    }
+
+    return 18
+  }
 }
