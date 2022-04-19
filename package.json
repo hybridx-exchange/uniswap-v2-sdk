@@ -1,15 +1,16 @@
 {
-  "name": "oasis-uniswap-v2-sdk",
+  "name": "@hybridx-exchange/uniswap-sdk",
   "license": "GPL-3.0-or-later",
-  "version": "2.1.9",
+  "version": "1.1.0",
   "description": "🛠 An SDK for building applications on top of Uniswap.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/dltswap/uniswap-v2-sdk.git",
+  "repository": "https://github.com/hybridx-exchange/uniswap-v2-sdk.git",
   "keywords": [
+    "hybridx",
     "uniswap",
     "ethereum"
   ],
@@ -27,7 +28,8 @@
     "@ethersproject/networks": "^5.0.0-beta.135",
     "@ethersproject/providers": "^5.0.0-beta.153",
     "@ethersproject/solidity": "^5.0.0-beta.131",
-    "@uniswap/v2-core": "^1.0.0",
+    "@ethersproject/units": "^5.0.0-beta.131",
+    "@hybridx-exchange/v2-core": "1.1.0",
     "big.js": "^5.2.2",
     "decimal.js-light": "^2.5.0",
     "jsbi": "^3.1.1",

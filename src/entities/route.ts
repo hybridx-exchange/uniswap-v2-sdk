@@ -1,4 +1,4 @@
-import { ChainId } from '../constants'
+import {BigintIsh, ChainId} from '../constants'
 import invariant from 'tiny-invariant'
 
 import { Currency, ETHER } from './currency'
@@ -9,11 +9,13 @@ import { Price } from './fractions/price'
 export class Route {
   public readonly pairs: Pair[]
   public readonly path: Token[]
+  public readonly amounts: BigintIsh[]
+  public readonly nextReserves: BigintIsh[]
   public readonly input: Currency
   public readonly output: Currency
   public readonly midPrice: Price
 
-  public constructor(pairs: Pair[], input: Currency, output?: Currency) {
+  public constructor(pairs: Pair[], amounts: BigintIsh[], nextReserves: BigintIsh[], input: Currency, output?: Currency) {
     invariant(pairs.length > 0, 'PAIRS')
     invariant(
       pairs.every(pair => pair.chainId === pairs[0].chainId),
@@ -41,6 +43,8 @@ export class Route {
 
     this.pairs = pairs
     this.path = path
+    this.amounts = amounts
+    this.nextReserves = nextReserves
     this.midPrice = Price.fromRoute(this)
     this.input = input
     this.output = output ?? path[path.length - 1]
