@@ -1071,10 +1071,10 @@
     "@ethersproject/properties" ">=5.0.0-beta.131"
     "@ethersproject/strings" ">=5.0.0-beta.130"
 
-"@hybridx-exchange/v2-core@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@hybridx-exchange/v2-core/-/v2-core-0.1.0.tgz#83534c7e59a3d942a30c202a47580ab7a9061ded"
-  integrity sha512-xGjrWYAnKEXbXChY5iVjO3Jqg40tAQ2ZDtNQhHBUkDmz30PiZLZaFQVUmzlmOpwtpoipmSw+H18t0Pl3aCcIlQ==
+"@hybridx-exchange/v2-core@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@hybridx-exchange/v2-core/-/v2-core-1.1.0.tgz#f15bd33adf5190029ff50245b7706e35b6285e27"
+  integrity sha512-3nfvfDGLJD2MSHTD2I9cSwIVGbVB71tOS/h27OzVWbulPDgABuR76mximwJZX3d+alEe7aLaxMIAkleDOk0llA==
 
 "@jest/console@^24.7.1", "@jest/console@^24.9.0":
   version "24.9.0"
